@@ -1,0 +1,262 @@
+m255
+K4
+z2
+13
+!s112 1.1
+!i10d 8192
+!i10e 25
+!i10f 100
+cModel Technology
+Z0 dC:/intelFPGA_lite/18.0/Labs/Lab3
+vadd
+Z1 !s110 1570079830
+!i10b 1
+!s100 g1[MT@PHI2;c[E:AUo;Dj2
+ILXUjc;[C3]FSkP;7F8gaG0
+Z2 VDg1SIo80bB@j0V0VzS_@n1
+Z3 dC:/intelFPGA_lite/18.0/Labs/lab3
+Z4 w1570079825
+Z5 8alu.v
+Z6 Falu.v
+L0 111
+Z7 OV;L;10.5b;63
+r1
+!s85 0
+31
+Z8 !s108 1570079830.000000
+Z9 !s107 alu.v|
+Z10 !s90 -reportprogress|300|-timescale|1ns/1ns|alu.v|
+!i113 1
+Z11 o-timescale 1ns/1ns
+Z12 tCvgOpt 0
+valu
+R1
+!i10b 1
+!s100 5V7@V3WF7QiAP843mibX02
+IAC<<MXSbCc_oKi[:3i3MR0
+R2
+R3
+R4
+R5
+R6
+L0 1
+R7
+r1
+!s85 0
+31
+R8
+R9
+R10
+!i113 1
+R11
+R12
+vconcat
+Z13 !s110 1570079831
+!i10b 1
+!s100 2z9D`bC7F>L>JAi_`ag4A1
+IP:O1bA6I;Q>_[Y1oHI;m=3
+R2
+R3
+R4
+R5
+R6
+L0 134
+R7
+r1
+!s85 0
+31
+R8
+R9
+R10
+!i113 1
+R11
+R12
+vfull_adder
+R13
+!i10b 1
+!s100 WY]BPm=AI5K4<9`UeWXYQ0
+IA5E^ZAJ@1G?BKzFnY6@m63
+R2
+R3
+R4
+R5
+R6
+L0 198
+R7
+r1
+!s85 0
+31
+R8
+R9
+R10
+!i113 1
+R11
+R12
+vmux
+!s110 1569982230
+!i10b 1
+!s100 Jff8C[z33ZXAM7JAIe;lB0
+IZIH5eaGAd<KjK<1?kL]Uh2
+R2
+R0
+w1569982210
+Z14 8mux.v
+Z15 Fmux.v
+Z16 L0 39
+R7
+r1
+!s85 0
+31
+!s108 1569982230.000000
+Z17 !s107 mux.v|
+Z18 !s90 -reportprogress|300|-timescale|1ns/1ns|mux.v|
+!i113 1
+R11
+R12
+vmux7
+!s110 1569982200
+!i10b 1
+!s100 EgW9H0T5>300YDh4YNZ3Q3
+Ia705V0L59m4U9FI^FK36F0
+R2
+R0
+w1569982161
+R14
+R15
+R16
+R7
+r1
+!s85 0
+31
+!s108 1569982200.000000
+R17
+R18
+!i113 1
+R11
+R12
+vmux7_2_1
+!s110 1569966972
+!i10b 1
+!s100 :GLi0k3P2g4NAI>PJGNU53
+I:zmz4Q7;Q?T`NZ6mhTkOm0
+R2
+R0
+w1569966941
+R14
+R15
+Z19 L0 17
+R7
+r1
+!s85 0
+31
+!s108 1569966972.000000
+R17
+R18
+!i113 1
+R11
+R12
+vmux7to1
+!s110 1569966797
+!i10b 1
+!s100 NWHeZQGI`?XOdLcF[<H2B0
+IDlA<dnYcmafGE5SYzS=CW2
+R2
+R0
+w1569962871
+R14
+R15
+R19
+R7
+r1
+!s85 0
+31
+!s108 1569966797.000000
+R17
+R18
+!i113 1
+R11
+R12
+vorxor
+R1
+!i10b 1
+!s100 V6AQU:=Ygdi<OGe0=U>>I0
+I7@53??30;Z4YX7V2@^YaN2
+R2
+R3
+R4
+R5
+R6
+L0 123
+R7
+r1
+!s85 0
+31
+R8
+R9
+R10
+!i113 1
+R11
+R12
+vreduc
+R13
+!i10b 1
+!s100 Fm5e>IDme1C]4ol`N?>1D0
+IXK``A0OPV>cBIcR@>fZPA3
+R2
+R3
+R4
+R5
+R6
+L0 145
+R7
+r1
+!s85 0
+31
+R8
+R9
+R10
+!i113 1
+R11
+R12
+vripple
+R13
+!i10b 1
+!s100 `kHFigQ4>O2Lcn4>J`NO?2
+I@VG@`I9VQngCeVc]i<WYA2
+R2
+R3
+R4
+R5
+R6
+L0 155
+R7
+r1
+!s85 0
+31
+R8
+R9
+R10
+!i113 1
+R11
+R12
+vseven_seg
+R13
+!i10b 1
+!s100 27TENAdb7N`cFRBUKCCfG3
+IM=CFOMNe0<LMCd8odCcgd0
+R2
+R3
+R4
+R5
+R6
+L0 207
+R7
+r1
+!s85 0
+31
+R8
+R9
+R10
+!i113 1
+R11
+R12

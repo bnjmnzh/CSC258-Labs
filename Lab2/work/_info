@@ -1,0 +1,136 @@
+m255
+K4
+z2
+13
+!s112 1.1
+!i10d 8192
+!i10e 25
+!i10f 100
+cModel Technology
+dC:/intelFPGA_lite/18.0/Labs/Lab3
+vdecode
+Z0 !s110 1569476210
+!i10b 1
+!s100 EZI6PjbIc2zHC8;nk^72K2
+I19o:XMOi:DaWeT^h:eLmz3
+Z1 VDg1SIo80bB@j0V0VzS_@n1
+Z2 dC:/intelFPGA_lite/18.0/Labs/Lab2
+Z3 w1569476030
+Z4 8SevenSegmentDecoder.v
+Z5 FSevenSegmentDecoder.v
+L0 1
+Z6 OV;L;10.5b;63
+r1
+!s85 0
+31
+Z7 !s108 1569476210.000000
+Z8 !s107 SevenSegmentDecoder.v|
+Z9 !s90 -reportprogress|300|-timescale|1ns/1ns|SevenSegmentDecoder.v|
+!i113 1
+Z10 o-timescale 1ns/1ns
+Z11 tCvgOpt 0
+vmux
+Z12 !s110 1569476540
+!i10b 1
+!s100 cdR_1YenO8Tj:kQjco8Hj0
+IR>@9X`C0?ZYPT;Gz=0e8a3
+R1
+R2
+Z13 w1568944882
+Z14 8mux.v
+Z15 Fmux.v
+L0 6
+R6
+r1
+!s85 0
+31
+Z16 !s108 1569476540.000000
+Z17 !s107 mux.v|
+Z18 !s90 -reportprogress|300|-timescale|1ns/1ns|mux.v|
+!i113 1
+R10
+R11
+vmux2to1
+R12
+!i10b 1
+!s100 TTIHj49<CR0@RI;z:V^^52
+I;;U2B[KUn:OCMzk>Rck643
+R1
+R2
+R13
+R14
+R15
+L0 18
+R6
+r1
+!s85 0
+31
+R16
+R17
+R18
+!i113 1
+R10
+R11
+vmux4
+Z19 !s110 1569476249
+!i10b 1
+!s100 0iCB6d_G;7nCge2QlF[dR1
+I6bLZeK6RVdZzI`IXaXNHL1
+R1
+R2
+Z20 w1569474505
+Z21 8four.v
+Z22 Ffour.v
+L0 20
+R6
+r1
+!s85 0
+31
+Z23 !s108 1569476249.000000
+Z24 !s107 four.v|
+Z25 !s90 -reportprogress|300|-timescale|1ns/1ns|four.v|
+!i113 1
+R10
+R11
+vmux4to1
+R19
+!i10b 1
+!s100 V:z7[g9A=TMn70a2Q7UL^0
+IXc@Vd2;b4jFnAeOWQNeA23
+R1
+R2
+R20
+R21
+R22
+L0 35
+R6
+r1
+!s85 0
+31
+R23
+R24
+R25
+!i113 1
+R10
+R11
+vseven_seg
+R0
+!i10b 1
+!s100 S`:NlZF1aeB0H=fIO5;zD2
+Ic_RlfIGWbVcU0MN?m?j?A3
+R1
+R2
+R3
+R4
+R5
+L0 11
+R6
+r1
+!s85 0
+31
+R7
+R8
+R9
+!i113 1
+R10
+R11
