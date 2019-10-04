@@ -10,8 +10,7 @@ module alu(LEDR, SW, KEY, HEX0, HEX1, HEX2, HEX3, HEX4, HEX5);
     output[6:0] HEX5; //ALUout[7:4]
 
     //A+1 using adder
-    wire[3:0] case0;
-    wire case01;
+    wire[7:0] case0;
     ripple r0(
         .A(SW[7:4]),
         .B(4'b0001),
@@ -32,13 +31,11 @@ module alu(LEDR, SW, KEY, HEX0, HEX1, HEX2, HEX3, HEX4, HEX5);
     );
 
     //A+B using + operator
-    wire[3:0] case2;
-    wire[3:0] case21;
+    wire[7:0] case2;
     add r2(
         .A(SW[7:4]),
         .B(SW[3:0]),
         .res(case2),
-        .overflow(case21)
     );
 
     //A xor B in lower and A or B in upper
@@ -71,11 +68,11 @@ module alu(LEDR, SW, KEY, HEX0, HEX1, HEX2, HEX3, HEX4, HEX5);
     begin
         case(KEY[2:0])
             3'b000: Out = {case01, case0};
-            3'b000: Out = {case11, case1};
-            3'b000: Out = {case21, case2};
-            3'b000: Out = case3;
-            3'b000: Out = case4;
-            3'b000: Out = case5;
+            3'b001: Out = {case11, case1};
+            3'b010: Out = case2;
+            3'b011: Out = case3;
+            3'b100: Out = case4;
+            3'b101: Out = case5;
             default: Out = 8'b00000000;
         endcase
     end
@@ -102,20 +99,18 @@ module alu(LEDR, SW, KEY, HEX0, HEX1, HEX2, HEX3, HEX4, HEX5);
         .display(HEX5[6:0])
     );
 
-    assign HEX1[6:0] = 7'b0000000;
-	assign HEX3[6:0] = 7'b0000000;
+    assign HEX1[6:0] = 7'b1000000;
+	assign HEX3[6:0] = 7'b1000000;
 
 endmodule
 
 //A+B using + operator
-module add(A, B, res, overflow);
+module add(A, B, res);
     input[3:0] A;
     input[3:0] B;
-    output[3:0] overflow;
-    output[3:0] res;
+    output[7:0] res;
 
-    assign res[3:0] = A + B;
-    assign overflow[3:0] = 4'b0000;
+    assign res = A + B;
 
 endmodule
 
