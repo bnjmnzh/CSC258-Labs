@@ -59,3 +59,35 @@ run 10ns
 
 force {KEY[0]} 1
 run 10ns
+
+# reset 
+run 10ns
+
+force {SW[9]} 1
+force {KEY[0]} 0
+run 10ns
+
+force {KEY[2]} 0
+force {KEY[1]} 1
+force {SW[7:0]} 2#00000000
+force {KEY[0]} 1
+run 10ns
+
+force {KEY[0]} 0
+run 10ns
+
+# reset 
+run 10ns
+
+force {SW[9]} 1
+force {KEY[0]} 0
+run 10ns
+
+force {KEY[2]} 0
+force {KEY[1]} 1
+force {SW[7:0]} 2#01010101
+force {KEY[0]} 1
+run 10ns
+
+force {KEY[0]} 0
+run 10ns
