@@ -4,12 +4,9 @@ module morse(SW, KEY, LEDR, CLOCK_50);
     input CLOCK_50;
     output[1:0] LEDR;
     wire[15:0] table_out;
-    wire[31:0] rate_out;
+    wire rate_out;
     wire shifter_enable;
     wire[31:0] period;
-
-    assign period = 25000000;
-    assign shifter_enable = (rate_out == 0) ? 1 : 0;
 
     lutable u0(
         .letter(SW[2:0]),
@@ -18,18 +15,17 @@ module morse(SW, KEY, LEDR, CLOCK_50);
 
     ratedivider u1(
         .clock(CLOCK_50),
-        .period(period),
+        .enable(KEY[1]),
         .reset_n(KEY[0]),
         .q(rate_out)
     );
 
     shifter u2(
-        .clock(CLOCK_50),
-        .enable(shifter_enable),
-        .load(KEY[1]),
-        .reset(~KEY[0]),
+        .enable(rate_out),
+        .reset(KEY[0]),
         .data(table_out),
-        .out(LEDR[0])
+        .out(LEDR[0]),
+        .CLOCK_50(CLOCK_50)
     );
 endmodule
 
@@ -53,40 +49,38 @@ module lutable(letter, morse);
     end
 endmodule
 
-module shifter(clock, enable, load, reset, data, out);
-    input clock, enable, load, reset;
+module shifter(reset, enable, data, out, CLOCK_50);
+    input enable, reset, CLOCK_50;
     input[15:0] data;
     output out;
     reg[15:0] s;
 
-    always @(posedge clock, posedge load, posedge reset)
+    always @(posedge CLOCK_50)
     begin
-        if (load)
+        if (reset == 1'b0)
             s = data;
-        else if (reset)
-            s = 0;
         else if (enable == 1'b1)
             s = s  << 1;
     end
     assign out = s[15];
 endmodule
 
-module ratedivider(clock, period, reset_n, q);
-    input clock;
-    input reset_n;
-    input[31:0] period;
-    output reg[31:0] q;
+module ratedivider(clock, enable, reset_n, q);
+    input clock, reset_n, enable;
+    output q;
+    reg[27:0] count;
 
-    always @(posedge clock, posedge reset_n)
+    always @(posedge clock)
     begin
         if (reset_n == 1'b0)
-            q <= period - 1;
+            count <= 28'd24999999;
         else
             begin
-                if (q == 0)
-                    q <= period - 1;
+                if (count == 0)
+                    count <= 28'd24999999;
                 else
-                    q <= q - 1'b1;
+                    count <= count - 1'b1;
             end
     end
+    assign q = (count == 0) ? 1 : 0;
 endmodule
