@@ -1,4 +1,4 @@
-module counter(SW, KEY, HEX0, HEX1);
+module Counter(SW, KEY, HEX0, HEX1);
     input[2:0] KEY;
     input[1:0] SW;
     output[6:0] HEX0, HEX1;
@@ -6,11 +6,20 @@ module counter(SW, KEY, HEX0, HEX1);
 
     count c1(
         .enable(SW[1]),
-        .clock(KEY[0]),
+        .clock(~KEY[0]),
         .clear(SW[0]),
         .Q(w1)
     );
-    
+	 
+	 HEX c2(
+			.S(w1[3:0]),
+			.H(HEX0)
+	 );
+	 
+	 HEX c3(
+			.S(w1[7:4]),
+			.H(HEX1)
+	 );
 endmodule
 
 module count(enable, clock, clear, Q);
@@ -34,7 +43,7 @@ module count(enable, clock, clear, Q);
         .q(Q[1])
     );
 
-    assign w2 = enable & Q[1];
+    assign w2 = w1 & Q[1];
 
     flipflop f2(
         .clock(clock),
@@ -43,7 +52,7 @@ module count(enable, clock, clear, Q);
         .q(Q[2])
     );
 
-    assign w3 = enable & Q[2];
+    assign w3 = w2 & Q[2];
 
     flipflop f3(
         .clock(clock),
@@ -52,7 +61,7 @@ module count(enable, clock, clear, Q);
         .q(Q[3])
     );
 
-    assign w4 = enable & Q[3];
+    assign w4 = w3 & Q[3];
 
     flipflop f4(
         .clock(clock),
@@ -61,7 +70,7 @@ module count(enable, clock, clear, Q);
         .q(Q[4])
     );
 
-    assign w5 = enable & Q[4];
+    assign w5 = w4 & Q[4];
 
     flipflop f5(
         .clock(clock),
@@ -70,7 +79,7 @@ module count(enable, clock, clear, Q);
         .q(Q[5])
     );
 
-    assign w6 = enable & Q[5];
+    assign w6 = w5 & Q[5];
 
     flipflop f6(
         .clock(clock),
@@ -79,7 +88,7 @@ module count(enable, clock, clear, Q);
         .q(Q[6])
     );
 
-    assign w7 = enable & Q[6];
+    assign w7 = w6 & Q[6];
 
     flipflop f7(
         .clock(clock),
