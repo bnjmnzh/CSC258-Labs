@@ -24,7 +24,7 @@ module divider(CLOCK_50, SW, KEY, HEX0);
         .CLOCK_50(CLOCK_50),
         .reset_n(KEY[0]),
         .period(period),
-        .cout(rateddivider_out)
+        .q(rateddivider_out)
     );
 
     displayCounter u1(
@@ -35,15 +35,15 @@ module divider(CLOCK_50, SW, KEY, HEX0);
     );
 
     HEX u2(
-        .S(displayCounter_out),
-        .H(HEX0)
+        .in(displayCounter_out),
+        .out(HEX0)
     );
 endmodule
 
-module rateddivider(period, reset_n, CLOCK_50, cout);
+module rateddivider(period, reset_n, CLOCK_50, q);
     input CLOCK_50, reset_n;
     input[27:0] period;
-    output cout;
+    output q;
 
     reg[27:0] count;
 
