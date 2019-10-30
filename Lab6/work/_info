@@ -8,24 +8,129 @@ z2
 !i10f 100
 cModel Technology
 Z0 dC:/Intel/Labs/CSC258-Labs/Lab6
-vsequence_detector
-!s110 1572050518
+vcontrol
+Z1 !s110 1572405406
 !i10b 1
-!s100 a`>8ejV?G1Kg0=h`eAS[c3
-IZV[Wd:CbJSA<d0QS@mEmB3
-VDg1SIo80bB@j0V0VzS_@n1
+!s100 nS`;9Q_z:>V;eo?Z?DQj_0
+IAkUDT4biB7lEWMOYL_Bik2
+Z2 VDg1SIo80bB@j0V0VzS_@n1
 R0
-w1572050516
-8sequence_detector.v
-Fsequence_detector.v
-L0 9
-OV;L;10.5b;63
+Z3 w1572405317
+Z4 8poly_function.v
+Z5 Fpoly_function.v
+L0 99
+Z6 OV;L;10.5b;63
 r1
 !s85 0
 31
-!s108 1572050518.000000
+Z7 !s108 1572405406.000000
+Z8 !s107 poly_function.v|
+Z9 !s90 -reportprogress|300|-timescale|1ns/1ns|poly_function.v|
+!i113 1
+Z10 o-timescale 1ns/1ns
+Z11 tCvgOpt 0
+vdatapath
+R1
+!i10b 1
+!s100 T@PGK;>UQR:l`I]lnHT@T2
+Io^dC5ibmP6gHj_fdR^`?l2
+R2
+R0
+R3
+R4
+R5
+L0 211
+R6
+r1
+!s85 0
+31
+R7
+R8
+R9
+!i113 1
+R10
+R11
+vfpga_top
+R1
+!i10b 1
+!s100 OPh4ml;o41Z`1aA[g5?012
+Ie];IHEcZ_zba[aRLO=Bh61
+R2
+R0
+R3
+R4
+R5
+L0 9
+R6
+r1
+!s85 0
+31
+R7
+R8
+R9
+!i113 1
+R10
+R11
+vhex_decoder
+R1
+!i10b 1
+!s100 Rb1N:NM<B8I1R1b]XIE^m1
+I8N0bJnV3TdKn<`zmCamU70
+R2
+R0
+R3
+R4
+R5
+L0 308
+R6
+r1
+!s85 0
+31
+R7
+R8
+R9
+!i113 1
+R10
+R11
+vpart2
+R1
+!i10b 1
+!s100 mJU]fEif:ezB6a8LO=Xzj1
+IzYjA:`1D4l4EJR9ZFcOoz3
+R2
+R0
+R3
+R4
+R5
+L0 45
+R6
+r1
+!s85 0
+31
+R7
+R8
+R9
+!i113 1
+R10
+R11
+vsequence_detector
+!s110 1572406778
+!i10b 1
+!s100 a`>8ejV?G1Kg0=h`eAS[c3
+IZV[Wd:CbJSA<d0QS@mEmB3
+R2
+R0
+w1572050740
+8sequence_detector.v
+Fsequence_detector.v
+L0 9
+R6
+r1
+!s85 0
+31
+!s108 1572406778.000000
 !s107 sequence_detector.v|
 !s90 -reportprogress|300|-timescale|1ns/1ns|sequence_detector.v|
 !i113 1
-o-timescale 1ns/1ns
-tCvgOpt 0
+R10
+R11

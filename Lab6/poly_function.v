@@ -119,7 +119,8 @@ module control(
                 S_LOAD_X_WAIT   = 4'd7,
                 S_CYCLE_0       = 4'd8,
                 S_CYCLE_1       = 4'd9,
-                S_CYCLE_2       = 4'd10;
+                S_CYCLE_2       = 4'd10,
+                S_CYCLE_3       = 4'd11;
     
     // Next state logic aka our state table
     always@(*)
@@ -134,7 +135,9 @@ module control(
                 S_LOAD_X: next_state = go ? S_LOAD_X_WAIT : S_LOAD_X; // Loop in current state until value is input
                 S_LOAD_X_WAIT: next_state = go ? S_LOAD_X_WAIT : S_CYCLE_0; // Loop in current state until go signal goes low
                 S_CYCLE_0: next_state = S_CYCLE_1;
-                S_CYCLE_1: next_state = S_LOAD_A; // we will be done our two operations, start over after
+                S_CYCLE_1: next_state = S_CYCLE_2; 
+                S_CYCLE_2: next_state = S_CYCLE_3;
+                S_CYCLE_3: next_state = S_LOAD_A; // we will be done our 4 operations, start over after
             default:     next_state = S_LOAD_A;
         endcase
     end // state_table
@@ -167,17 +170,29 @@ module control(
             S_LOAD_X: begin
                 ld_x = 1'b1;
                 end
-            S_CYCLE_0: begin // Do A <- A * A 
-                ld_alu_out = 1'b1; ld_a = 1'b1; // store result back into A
-                alu_select_a = 2'b00; // Select register A
-                alu_select_b = 2'b00; // Also select register A
+            S_CYCLE_0: begin // Do C <- C * x
+                ld_alu_out = 1'b1; ld_c = 1'b1; // store result back into C
+                alu_select_a = 2'b10; // Select register C
+                alu_select_b = 2'b11; // Also select register x
                 alu_op = 1'b1; // Do multiply operation
             end
-            S_CYCLE_1: begin
-                ld_r = 1'b1; // store result in result register
-                alu_select_a = 2'b00; // Select register A
-                alu_select_b = 2'b10; // Select register C
+            S_CYCLE_1: begin // Do C <- C*x + B
+                ld_alu_out = 1'b1; ld_c = 1'b1; // store result back into C
+                alu_select_a = 2'b10; // Select register C
+                alu_select_b = 2'b01; // Select register B
                 alu_op = 1'b0; // Do Add operation
+            end
+            S_CYCLE_2: begin // Do C <- (C*x + B)x
+                ld_alu_out = 1'b1; ld_c = 1'b1; // store result back into C
+                alu_select_a = 2'b10; // Select register C
+                alu_select_b = 2'b11; // Select register x
+                alu_op = 1'b1; // Do multiply operation
+            end
+            S_CYCLE_3: begin // Do C <- (C*x + B)x + A
+                ld_r = 1'b1; // Store result in register
+                alu_select_a = 2'b10; // Select register C
+                alu_select_b = 2'b00; // Select register A
+                alu_op = 1'b0; // Do multiply operation
             end
         // default:    // don't need default since we already made sure all of our outputs were assigned a value at the start of the always block
         endcase
@@ -227,10 +242,10 @@ module datapath(
             if (ld_b)
                 b <= ld_alu_out ? alu_out : data_in; // load alu_out if load_alu_out signal is high, otherwise load from data_in
             if (ld_x)
-                x <= data_in;
+                x <= ld_alu_out ? alu_out : data_in;
 
             if (ld_c)
-                c <= data_in;
+                c <= ld_alu_out ? alu_out : data_in;
         end
     end
  
