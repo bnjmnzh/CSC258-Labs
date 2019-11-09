@@ -96,18 +96,20 @@ module datapath(location_in, colour_in, clock, resetn, controlX, controlY, contr
 	input controlX, controlY, controlC;
 	output [7:0] x_out;
 	output [6:0] y_out;
+    output [2:0] colour_out;
 
 	reg [7:0] x;
 	reg [6:0] y;
 	reg [2:0] colour;
 	reg [1:0] i_x, i_y;
-	reg [1:0] enable_y;
+	reg enable_y;
 
-	always @(posedge clock) begin
-		if (!resetn) begin
+	always @(posedge clock) begin 
+		if(!resetn) begin
 			x <= 8'b0;
 			y <= 7'b0;
 			colour <= 3'b0;
+		end
 		else begin
 			if (controlX)
 				x <= {1'b0, location_in};
@@ -122,26 +124,26 @@ module datapath(location_in, colour_in, clock, resetn, controlX, controlY, contr
 		if (!resetn)
 			i_x <= 2'b00;
 		else if(enable_x) begin
-			if(i_x == 2'b11);
+			if(i_x == 2'b11) begin
 				i_x <= 2'b00;
 				enable_y <= 1;
-				end
+			    end
 			else begin
 				i_x <= i_x + 1;
 				enable_y <= 0;
-			end
-		end
+			    end
+		    end
 	end
 
 	always @(posedge clock) begin
 		if (!resetn)
 			i_y <= 2'b00;
 		else if(enable_y) begin
-			if(i_y == 2'b11);
+			if(i_y == 2'b11)
 				i_y <= 2'b00;
-			else
+			else 
 				i_y <= i_y + 1;
-		end
+		    end
 	end
 
 	assign x_out = x + i_x;
