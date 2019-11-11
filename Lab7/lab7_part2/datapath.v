@@ -33,10 +33,10 @@ module datapath(location_in, colour_in, clock, resetn, controlX, controlY, contr
 
 	always @(posedge clock) begin
 		if (!resetn)
-			i_x <= 2'b0000;
+			i_x <= 4'b0000;
 		else if(enable_x) begin
-			if(i_x == 2'b1111) begin
-				i_x <= 2'b0000;
+			if(i_x == 4'b1111) begin
+				i_x <= 4'b0000;
 				enable_y <= 1;
 			    end
 			else begin
@@ -48,10 +48,10 @@ module datapath(location_in, colour_in, clock, resetn, controlX, controlY, contr
 
 	always @(posedge clock) begin
 		if (!resetn)
-			i_y <= 2'b0000;
+			i_y <= 4'b0000;
 		else if(enable_y) begin
-			if(i_y == 2'b1111)
-				i_y <= 2'b0000;
+			if(i_y == 4'b1111)
+				i_y <= 4'b0000;
 			else 
 				i_y <= i_y + 1;
 		    end

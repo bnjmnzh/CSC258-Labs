@@ -1,6 +1,6 @@
-module control(clock, resetn, load, go, controlX, controlY, controlC, writeEn);
+module control(clock, resetn, load, go, controlX, controlY, controlC, writeEn, enable_x);
     input clock, resetn, load, go;
-    output reg controlC, controlX, controlY, writeEn;
+    output reg controlC, controlX, controlY, writeEn, enable_x;
     reg [2:0] curr, next;
 
     localparam  LOAD_X = 3'b000,
@@ -36,7 +36,10 @@ module control(clock, resetn, load, go, controlX, controlY, controlC, writeEn);
         controlC = 1'b0;
         writeEn = 0;
         case (curr)
-            LOAD_X: controlX = 1;
+            LOAD_X: begin
+                controlX = 1;
+                enable_x = 1;
+                end
             LOAD_X_WAIT: controlX = 1;
             LOAD_Y: 
                 begin

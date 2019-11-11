@@ -8,45 +8,66 @@ z2
 !i10f 100
 cModel Technology
 Z0 dC:/Intel/Labs/CSC258-Labs/Lab7/lab7_part2
+vcombination
+Z1 !s110 1573507508
+!i10b 1
+!s100 0iXl?I6N_hlnBWd;G@oK>3
+IcCCa[SX3JJOm[G=m?F@Kg2
+Z2 VDg1SIo80bB@j0V0VzS_@n1
+R0
+Z3 w1573507456
+Z4 8combination.v
+Z5 Fcombination.v
+L0 1
+Z6 OV;L;10.5b;63
+r1
+!s85 0
+31
+Z7 !s108 1573507508.000000
+Z8 !s107 combination.v|
+Z9 !s90 -reportprogress|300|-timescale|1ns/1ns|combination.v|
+!i113 1
+Z10 o-timescale 1ns/1ns
+Z11 tCvgOpt 0
 vcontrol
-!s110 1573288225
-!i10b 1
-!s100 7YLNH99D<6eI710lo8KJS0
-IhCNLlRa=KWboSoRhUANbi0
-Z1 VDg1SIo80bB@j0V0VzS_@n1
-R0
-w1573288218
-8control.v
-Fcontrol.v
-L0 1
-Z2 OV;L;10.5b;63
-r1
-!s85 0
-31
-!s108 1573288225.000000
-!s107 control.v|
-!s90 -reportprogress|300|-timescale|1ns/1ns|control.v|
-!i113 1
-Z3 o-timescale 1ns/1ns
-Z4 tCvgOpt 0
-vdatapath
-!s110 1573282812
-!i10b 1
-!s100 o5gkJk`i7Ebz:a]^=K0j12
-I8GZihjE14iU3TSC7cK0@93
 R1
-R0
-w1573282589
-8datapath.v
-Fdatapath.v
-L0 1
+!i10b 1
+!s100 2m_[ljKO4LEX]=WDH9UCo3
+IR3aN:a<Gb=5F9`;PJ1:mQ3
 R2
-r1
-!s85 0
-31
-!s108 1573282812.000000
-!s107 datapath.v|
-!s90 -reportprogress|300|-timescale|1ns/1ns|datapath.v|
-!i113 1
+R0
 R3
 R4
+R5
+L0 37
+R6
+r1
+!s85 0
+31
+R7
+R8
+R9
+!i113 1
+R10
+R11
+vdatapath
+R1
+!i10b 1
+!s100 ;Zl9hie3GAfjLd[U79GkF3
+Ia=VneL7=KQ[90^hk1`13z1
+R2
+R0
+R3
+R4
+R5
+L0 97
+R6
+r1
+!s85 0
+31
+R7
+R8
+R9
+!i113 1
+R10
+R11
