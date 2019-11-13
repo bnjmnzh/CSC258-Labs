@@ -84,6 +84,18 @@ module part2
 		.colour_out(colour)
 	);
 
+	controller c0(
+		.clock(CLOCK_50),
+		.resetn(resetn),
+		.load(!(KEY[3])),
+		.go(!(KEY[1])),
+		.controlX(id_x),
+		.controlY(id_y),
+		.controlC(id_c),
+		.writeEn(writeEn),
+		.enable_x(enable)
+	);
+
     // Instansiate FSM control
     // control c0(...);
 
@@ -101,7 +113,7 @@ module datapath(location_in, colour_in, clock, resetn, controlX, controlY, contr
 	reg [7:0] x;
 	reg [6:0] y;
 	reg [2:0] colour;
-	reg [1:0] i_x, i_y;
+	reg [3:0] i_x, i_y;
 	reg enable_y;
 
 	always @(posedge clock) begin 
@@ -122,10 +134,10 @@ module datapath(location_in, colour_in, clock, resetn, controlX, controlY, contr
 
 	always @(posedge clock) begin
 		if (!resetn)
-			i_x <= 2'b00;
+			i_x <= 4'b0000;
 		else if(enable_x) begin
-			if(i_x == 2'b11) begin
-				i_x <= 2'b00;
+			if(i_x == 4'b1111) begin
+				i_x <= 4'b0000;
 				enable_y <= 1;
 			    end
 			else begin
@@ -137,10 +149,10 @@ module datapath(location_in, colour_in, clock, resetn, controlX, controlY, contr
 
 	always @(posedge clock) begin
 		if (!resetn)
-			i_y <= 2'b00;
+			i_y <= 4'b0000;
 		else if(enable_y) begin
-			if(i_y == 2'b11)
-				i_y <= 2'b00;
+			if(i_y == 4'b1111)
+				i_y <= 4'b0000;
 			else 
 				i_y <= i_y + 1;
 		    end
@@ -150,3 +162,64 @@ module datapath(location_in, colour_in, clock, resetn, controlX, controlY, contr
 	assign y_out = y + i_y;
 	assign colour_out = colour;
 endmodule
+
+module control(clock, resetn, load, go, controlX, controlY, controlC, writeEn, enable_x);
+    input clock, resetn, load, go;
+    output reg controlC, controlX, controlY, writeEn, enable_x;
+    reg [2:0] curr, next;
+
+    localparam  LOAD_X = 3'b000,
+                LOAD_X_WAIT = 3'b001,
+                LOAD_Y = 3'b010,
+                LOAD_Y_WAIT = 3'b011,
+                PLOT = 3'b100;
+
+    // active low reset
+    always @(posedge clock) begin
+        if(!resetn)
+            curr <= LOAD_X;
+        else
+            curr <= next; 
+    end
+    // State Table
+    always @(*)
+    begin: state_table
+        case (curr)
+            LOAD_X: next = load ? LOAD_X_WAIT : LOAD_X; // load load if load is high, otherwise load from LOAD_X
+            LOAD_X_WAIT: next = load ? LOAD_X_WAIT : LOAD_Y; //load load if load is high, otherwise load from LOAD_Y
+            LOAD_Y: next = go ? LOAD_Y_WAIT : LOAD_Y; // load go if go is high, otherwise load from LOAD_Y
+            LOAD_Y_WAIT: next = go ? LOAD_Y_WAIT :  PLOT; // load go if go is high, eitherwise load PLOT
+            PLOT: next = load ? LOAD_X : PLOT; // load load if load is high, otherwise load PLOT
+            default: next = LOAD_X;
+        endcase
+    end
+    
+    always @(*)
+    begin
+        controlX = 1'b0;
+        controlY = 1'b0;
+        controlC = 1'b0;
+        writeEn = 0;
+        case (curr)
+            LOAD_X: begin
+                controlX = 1;
+                enable_x = 1;
+                end
+            LOAD_X_WAIT: controlX = 1;
+            LOAD_Y: 
+                begin
+                    controlX = 0;
+                    controlY = 1;
+                    controlC = 1;
+                end
+            LOAD_Y_WAIT:
+                begin
+                    controlX = 0;
+                    controlY = 1;
+                    controlC = 1;
+                end
+            PLOT: writeEn = 1;
+        endcase
+    end
+endmodule
+
