@@ -84,7 +84,7 @@ module part2
 		.colour_out(colour)
 	);
 
-	controller c0(
+	control c0(
 		.clock(CLOCK_50),
 		.resetn(resetn),
 		.load(!(KEY[3])),
