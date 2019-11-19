@@ -45,7 +45,7 @@ module control(clock, resetn, load, go, controlX, controlY, controlC, writeEn, e
                 LOAD_Y_WAIT = 3'b011,
                 PLOT = 3'b100;
 
-    // active low reset
+    // Current state registers
     always @(posedge clock) begin
         if(!resetn)
             curr <= LOAD_X;
@@ -105,12 +105,16 @@ module datapath(location_in, colour_in, clock, resetn, controlX, controlY, contr
 	output [6:0] y_out;
     output [2:0] colour_out;
 
+    // Input registers
 	reg [7:0] x;
 	reg [6:0] y;
 	reg [2:0] colour;
+
+
 	reg [3:0] i_x, i_y;
 	reg enable_y;
 
+    // X, Y, C registers
 	always @(posedge clock) begin 
 		if(!resetn) begin
 			x <= 8'b0;
@@ -127,6 +131,7 @@ module datapath(location_in, colour_in, clock, resetn, controlX, controlY, contr
 		end
 	end
 
+    // Inccrement x
 	always @(posedge clock) begin
 		if (!resetn)
 			i_x <= 4'b0000;
@@ -142,6 +147,7 @@ module datapath(location_in, colour_in, clock, resetn, controlX, controlY, contr
 		    end
 	end
 
+    // Inccrement y
 	always @(posedge clock) begin
 		if (!resetn)
 			i_y <= 4'b0000;
