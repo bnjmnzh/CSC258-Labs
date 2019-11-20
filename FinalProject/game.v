@@ -11,7 +11,7 @@ module game(
   output [9:0] VGA_G,	 						//	VGA Green[9:0]
   output [9:0] VGA_B,    //	VGA Blue[9:0]
   input [3:0] KEY,
-  input [17:0] SW,
+  input [7:0] SW,
   output  [6:0]  HEX0, HEX1, HEX2, HEX3, HEX4, HEX5, HEX6, HEX7,
   output  [8:0]  LEDG,  //  LED Green[8:0]
   output  [17:0]  LEDR,  //  LED Red[17:0]
@@ -22,6 +22,30 @@ module game(
     wire [7:0] keyValue;
     wire tick;
     reg [31:0] tps = 32'd15;
+
+    // Create an Instance of a VGA controller - there can be only one!
+	// Define the number of colours as well as the initial background
+	// image file (.MIF) for the controller.
+	vga_adapter VGA(
+			.resetn(resetn),
+			.clock(CLOCK_50),
+			.colour(colour),
+			.x(x),
+			.y(y),
+			.plot(writeEn),
+			/* Signals for the DAC to drive the monitor. */
+			.VGA_R(VGA_R),
+			.VGA_G(VGA_G),
+			.VGA_B(VGA_B),
+			.VGA_HS(VGA_HS),
+			.VGA_VS(VGA_VS),
+			.VGA_BLANK(VGA_BLANK_N),
+			.VGA_SYNC(VGA_SYNC_N),
+			.VGA_CLK(VGA_CLK));
+	  defparam VGA.RESOLUTION = "160x180";
+		defparam VGA.MONOCHROME = "FALSE";
+		defparam VGA.BITS_PER_COLOUR_CHANNEL = 1;
+		defparam VGA.BACKGROUND_IMAGE = "street.mif";
 
     // always @(posedge tick) begin
     //     if (keyValue == )
