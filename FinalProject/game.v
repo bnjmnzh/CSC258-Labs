@@ -39,18 +39,20 @@ module game(
 	localparam none = 2'b00,
 				  left = 2'b01,
 				  right = 2'b10,
-				  speed = 10;
+				  speed = 10,
+				  colour_background = 3'b000;
 	
-	wire resetn;
+	wire resetn, erase;
 	assign resetn = KEY[0];
 	wire [2:0] colour;
+	wire [2:0] colour_car;
 	reg [7:0] x_init = 8'b10100000;
 	wire [7:0] y_init = 8'b11111111;
 	wire [7:0] x_final;
 	wire [7:0] y_final;
-   wire [7:0] keyValue;
-   wire tick;
-   reg [31:0] tps = 32'd15;
+	wire [7:0] keyValue;
+	wire tick;
+	reg [31:0] tps = 32'd15;
 	wire writeEn, enable, id_x, id_y;
 	reg [2:0] direction = none;
 
@@ -79,7 +81,7 @@ module game(
 		defparam VGA.BACKGROUND_IMAGE = "black.mif";
 
     keyboardController(CLOCK_50, PS2_DAT, PS2_CLK, keyValue);
-	 Tick(CLOCK_50, tick, tps);
+	Tick(CLOCK_50, tick, tps);
 	 
 //	 always @(posedge tick) begin
 //		if (keyValue == 116 & direction != left) begin // Right if not left
@@ -99,9 +101,9 @@ module game(
 //	end
 	
 	always @(posedge tick) begin
-		if (SW[1] & direction != left) begin // left if not right 
+		if (!KEY[3] & direction != left) begin // left if not right 
 				direction <= left;
-		end else if (SW[0] & direction != right) begin // Right if not left
+		end else if (!KEY[2] & direction != right) begin // Right if not left
 				direction <= right;
 		end else begin // No movement
 				direction <= none;
@@ -113,6 +115,7 @@ module game(
 			x_init <= x_init + speed;
 		// No movement
 		end
+//		colour <= (erase == 1'b1) ? colour_background : colour_car;
 	end
 	 
 	 sprite_ram #(
@@ -134,8 +137,6 @@ module game(
 		.y_in(y_init),
 		.clock(CLOCK_50),
 		.resetn(resetn),
-		.controlX(id_x),
-		.controlY(id_y),
 		.enable_x(enable),
 		.x_out(x_final),
 		.y_out(y_final)
@@ -147,14 +148,10 @@ module game(
 	control c0(
 		.clock(CLOCK_50),
 		.resetn(resetn),
-		.load(!(KEY[3])),
-		.go(!(KEY[1])),
-		.controlX(id_x),
-		.controlY(id_y),
+		.erase(erase),
 		.writeEn(writeEn),
 		.enable_x(enable)
 	);
-
 
 endmodule
 

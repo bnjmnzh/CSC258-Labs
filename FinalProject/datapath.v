@@ -1,10 +1,9 @@
-module datapath(x_in, y_in, clock, resetn, controlX, controlY, enable_x, x_out, y_out);
+module datapath(x_in, y_in, clock, resetn, enable_x, x_out, y_out);
 	input [7:0] x_in;
 	input [7:0] y_in;
 	input clock;
 	input resetn;
 	input enable_x;
-	input controlX, controlY;
 	output [7:0] x_out;
 	output [7:0] y_out;
 
@@ -20,9 +19,7 @@ module datapath(x_in, y_in, clock, resetn, controlX, controlY, enable_x, x_out, 
 			y <= 8'b00000000;
 		end
 		else begin
-			if (controlX)
 				x <= x_in;
-			if (controlY)
 				y <= y_in;
 		end
 	end
@@ -38,7 +35,7 @@ module datapath(x_in, y_in, clock, resetn, controlX, controlY, enable_x, x_out, 
 			else begin
 				i_x <= i_x + 1;
 				enable_y <= 0;
-			    end
+			   end
 		    end
 	end
 
