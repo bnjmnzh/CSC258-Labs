@@ -1,14 +1,12 @@
-module control(clock, resetn, erase, writeEn, enable_x);
-    input clock, resetn;
+module control(clock, resetn, done, erase, writeEn, enable_x);
+    input clock, resetn, done;
     output reg writeEn, enable_x, erase;
     reg [2:0] curr, next;
 
-    localparam  LOAD_X = 3'b000,
-                LOAD_X_WAIT = 3'b001,
-                LOAD_Y = 3'b010,
-                LOAD_Y_WAIT = 3'b011,
-                PLOT = 3'b100,
-                ERASE = 3'b101;
+    localparam  PLOT = 3'b000,
+					 PLOT_WAIT = 3'b001,
+                ERASE = 3'b010;
+					 
 
     // active low reset
     always @(posedge clock) begin
@@ -21,7 +19,8 @@ module control(clock, resetn, erase, writeEn, enable_x);
     always @(*)
     begin: state_table
         case (curr)
-            PLOT: next = ERASE;
+            PLOT: next = PLOT_WAIT;
+				PLOT_WAIT: next = done ? ERASE : PLOT_WAIT ;
             ERASE: next = PLOT;
             default: next = PLOT;
         endcase
@@ -33,6 +32,11 @@ module control(clock, resetn, erase, writeEn, enable_x);
         erase = 0;
         case (curr)
             PLOT:
+				begin
+				writeEn = 1;
+				enable_x = 1;
+				end
+				PLOT_WAIT:
 				begin
 				writeEn = 1;
 				enable_x = 1;

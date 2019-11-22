@@ -39,12 +39,12 @@ module game(
 	localparam none = 2'b00,
 				  left = 2'b01,
 				  right = 2'b10,
-				  speed = 10,
+				  speed = 5,
 				  colour_background = 3'b000;
 	
-	wire resetn, erase;
+	wire resetn, erase, done;
 	assign resetn = KEY[0];
-	wire [2:0] colour;
+	reg [2:0] colour;
 	wire [2:0] colour_car;
 	reg [7:0] x_init = 8'b10100000;
 	wire [7:0] y_init = 8'b11111111;
@@ -115,7 +115,9 @@ module game(
 			x_init <= x_init + speed;
 		// No movement
 		end
-//		colour <= (erase == 1'b1) ? colour_background : colour_car;
+		colour <= (erase == 1'b1) ? colour_background : colour_car;
+		
+		
 	end
 	 
 	 sprite_ram #(
@@ -127,7 +129,7 @@ module game(
     ) srm_frog (
         .clk(CLOCK_50),
         .x(x_final), .y(y_final),
-        .color_out(colour)
+        .color_out(colour_car)
     );
 	 
 	// Instansiate datapath
@@ -137,6 +139,7 @@ module game(
 		.y_in(y_init),
 		.clock(CLOCK_50),
 		.resetn(resetn),
+		.done(done),
 		.enable_x(enable),
 		.x_out(x_final),
 		.y_out(y_final)
@@ -149,6 +152,7 @@ module game(
 		.clock(CLOCK_50),
 		.resetn(resetn),
 		.erase(erase),
+		.done(done),
 		.writeEn(writeEn),
 		.enable_x(enable)
 	);
