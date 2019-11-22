@@ -1,58 +1,45 @@
-module datapath(x_in, y_in, clock, resetn, controlX, controlY, enable_x, x_out, y_out);
+module datapath(x_in, y_in, clock, resetn, done, enable, x_out, y_out);
 	input [7:0] x_in;
 	input [7:0] y_in;
 	input clock;
 	input resetn;
-	input enable_x;
-	input controlX, controlY;
+	input enable;
 	output [7:0] x_out;
 	output [7:0] y_out;
+	output reg done;
 
-	reg [7:0] x;
-	reg [6:0] y;
 	reg [6:0] i_x;
 	reg [7:0] i_y;
-	reg enable_y;
 
-	always @(posedge clock) begin 
-		if(!resetn) begin
-			x <= 8'b00000000;
-			y <= 8'b00000000;
-		end
-		else begin
-			if (controlX)
-				x <= x_in;
-			if (controlY)
-				y <= y_in;
-		end
-	end
-
-	always @(posedge clock) begin
-		if (!resetn)
-			i_x <= 0;
-		else if(enable_x) begin
-			if(i_x == 27) begin
-				i_x <= 0;
-				enable_y <= 1;
-			    end
-			else begin
-				i_x <= i_x + 1;
-				enable_y <= 0;
-			    end
-		    end
-	end
-
-	always @(posedge clock) begin
-		if (!resetn)
-			i_y <= 0;
-		else if(enable_y) begin
-			if(i_y == 48)
-				i_y <= 0;
-			else 
-				i_y <= i_y + 1;
-		    end
-	end
+	always @ (posedge clock) begin
 	
-	assign x_out = x + i_x;
-	assign y_out = y + i_y;
+			// Reset when no enable signal.
+        if (!enable || resetn) begin
+             i_x <= 0;
+             i_y <= 0;
+        end
+       
+        // Increment on enable signal.
+        if (enable) begin
+            if (i_x < 16) begin
+                i_x <= i_x + 1;
+            end else begin
+                i_x <= 0;
+                i_y <= i_y + 1;
+            end
+        end
+ 
+        // Signal done when reached max.
+        // MAX_X - 2 is so that the signal is high during the last (x, y).
+        if (i_x == 15 && i_y == 46) begin
+            done <= 1;
+        end else begin
+            done <= 0;
+        end
+ 
+    end
+			
+	
+	assign x_out = x_in + i_x;
+	assign y_out = y_in + i_y;
 endmodule
