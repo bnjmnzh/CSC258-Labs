@@ -39,7 +39,7 @@ module game(
 	localparam none = 2'b00,
 				  left = 2'b01,
 				  right = 2'b10,
-				  speed = 5,
+				  speed = 10,
 				  colour_background = 3'b000;
 	
 	wire resetn, erase, done;
@@ -48,19 +48,24 @@ module game(
 	wire [2:0] colour_car;
 	reg want_move;
 	wire can_move;
+	reg [4:0] car_x = 0;
+	reg [5:0] car_y = 0;
+	reg enable_y;
 	reg [7:0] x_init = 8'b10100000;
-	wire [7:0] y_init = 100;
+	wire [7:0] y_init = 190;
 	wire [7:0] x_final;
 	wire [7:0] y_final;
 	wire [7:0] keyValue;
 	wire tick;
-	reg [31:0] tps = 40;
+	reg [31:0] tps = 1000;
 	wire writeEn, enable, id_x, id_y;
 	reg [2:0] direction = none;
 
 	
-	hex_decoder h0(x_init[3:0],HEX0);
-	hex_decoder h1(x_init[7:4],HEX1);
+	hex_decoder h0(erase,HEX0);
+	hex_decoder h1(can_move,HEX1);
+	hex_decoder h2(want_move,HEX2);
+	hex_decoder h3(done,HEX3);
 	
 	 // Create an Instance of a VGA controller - there can be only one!
 	// Define the number of colours as well as the initial background
@@ -104,14 +109,14 @@ module game(
 	// Returns color of pixel in .mif for x,y coordinates
 	
 	sprite_ram #(
-        .WIDTH_X(5),
-        .WIDTH_Y(7),
+        .WIDTH_X(6),
+        .WIDTH_Y(8),
         .RESOLUTION_X(27),
         .RESOLUTION_Y(48),
         .MIF_FILE("PixelCar.mif")
     ) srm_frog (
         .clk(tick),
-        .x(x_final), .y(y_final),
+        .x(x_final - x_init), .y(y_final - y_init),
         .color_out(colour_car)
     );
 	 
@@ -131,7 +136,32 @@ module game(
 
 //   keyboardController(CLOCK_50, PS2_DAT, PS2_CLK, keyValue);
 	Tick(CLOCK_50, tick, tps);
-	 
+	
+	always @(posedge tick) begin
+		if(resetn)
+			car_x <= 0;
+		else if (enable) begin
+			if (car_x == 27) begin
+				car_x <= 0;
+				enable_y <= 1;
+			end
+			else begin
+				car_x <= car_x + 1;
+				enable_y <= 0;
+			end
+		end		
+	end
+	
+	always @(posedge tick) begin
+		if (resetn) 
+			car_y <= 0;
+		else if (enable_y) begin
+			if (car_y == 48)
+				car_y <= 0;
+			else
+				car_y <= car_y + 1;
+		end
+	end
 	
 	always @(posedge tick) begin
 		if (!KEY[3] & direction != right) begin // left if not right

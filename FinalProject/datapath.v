@@ -21,7 +21,7 @@ module datapath(x_in, y_in, clock, resetn, done, enable, x_out, y_out);
        
         // Increment on enable signal.
         if (enable) begin
-            if (i_x < 16) begin
+            if (i_x < 27) begin
                 i_x <= i_x + 1;
             end else begin
                 i_x <= 0;
@@ -31,7 +31,7 @@ module datapath(x_in, y_in, clock, resetn, done, enable, x_out, y_out);
  
         // Signal done when reached max.
         // MAX_X - 2 is so that the signal is high during the last (x, y).
-        if (i_x == 15 && i_y == 46) begin
+        if (i_x == 27 && i_y == 48) begin
             done <= 1;
         end else begin
             done <= 0;
