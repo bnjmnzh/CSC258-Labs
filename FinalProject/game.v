@@ -34,19 +34,18 @@ module game(
 	output	[9:0]	VGA_G;	 				//	VGA Green[9:0]
 	output	[9:0]	VGA_B;   				//	VGA Blue[9:0]
 	output  [6:0]  HEX0, HEX1, HEX2, HEX3, HEX4, HEX5, HEX6, HEX7;
-	
-	
+
+
 	localparam none = 2'b00,
 				  left = 2'b01,
 				  right = 2'b10,
-				  speed = 10,
+				  speed = 1,
 				  colour_background = 3'b000;
-	
+
 	wire resetn, erase, done;
 	assign resetn = !KEY[0];
 	wire [2:0] colour;
 	wire [2:0] colour_car;
-	reg want_move;
 	wire can_move;
 	reg [4:0] car_x = 0;
 	reg [5:0] car_y = 0;
@@ -57,16 +56,16 @@ module game(
 	wire [7:0] y_final;
 	wire [7:0] keyValue;
 	wire tick;
-	reg [31:0] tps = 1000;
+	reg [31:0] tps = 7000;
 	wire writeEn, enable, id_x, id_y;
 	reg [2:0] direction = none;
+	wire [2:0] state;
 
-	
-	hex_decoder h0(erase,HEX0);
+	hex_decoder h0(done,HEX0);
 	hex_decoder h1(can_move,HEX1);
-	hex_decoder h2(want_move,HEX2);
-	hex_decoder h3(done,HEX3);
-	
+	hex_decoder h2(erase,HEX2);
+	hex_decoder h3(state,HEX3);
+
 	 // Create an Instance of a VGA controller - there can be only one!
 	// Define the number of colours as well as the initial background
 	// image file (.MIF) for the controller.
@@ -90,36 +89,21 @@ module game(
 		defparam VGA.MONOCHROME = "FALSE";
 		defparam VGA.BITS_PER_COLOUR_CHANNEL = 1;
 		defparam VGA.BACKGROUND_IMAGE = "black.mif";
-	
-		
+
+
     // Instansiate FSM control
 
 	control c0(
 		.clock(tick),
 		.reset(resetn),
 		.erase(erase),
-		.want_move(want_move),
 		.done(done),
 		.en_vga(writeEn),
 		.en_datapath(enable),
-		.can_move(can_move)
+		.can_move(can_move),
+		.state(state)
 	);
-	
-	
-	// Returns color of pixel in .mif for x,y coordinates
-	
-	sprite_ram #(
-        .WIDTH_X(6),
-        .WIDTH_Y(8),
-        .RESOLUTION_X(27),
-        .RESOLUTION_Y(48),
-        .MIF_FILE("PixelCar.mif")
-    ) srm_frog (
-        .clk(tick),
-        .x(x_final - x_init), .y(y_final - y_init),
-        .color_out(colour_car)
-    );
-	 
+
 	// Instansiate datapath
 	// datapath d0(...);
 	datapath d0(
@@ -132,63 +116,53 @@ module game(
 		.x_out(x_final),
 		.y_out(y_final)
 	);
+	
+	// Returns color of pixel in .mif for x,y coordinates
+
+	sprite_ram #(
+        .WIDTH_X(6),
+        .WIDTH_Y(8),
+        .RESOLUTION_X(27),
+        .RESOLUTION_Y(48),
+        .MIF_FILE("PixelCar.mif")
+    ) srm_frog (
+        .clk(tick),
+        .x(x_final - x_init), .y(y_final - y_init),
+        .color_out(colour_car)
+    );
 
 
 //   keyboardController(CLOCK_50, PS2_DAT, PS2_CLK, keyValue);
 	Tick(CLOCK_50, tick, tps);
-	
-	always @(posedge tick) begin
-		if(resetn)
-			car_x <= 0;
-		else if (enable) begin
-			if (car_x == 27) begin
-				car_x <= 0;
-				enable_y <= 1;
-			end
-			else begin
-				car_x <= car_x + 1;
-				enable_y <= 0;
-			end
-		end		
-	end
-	
-	always @(posedge tick) begin
-		if (resetn) 
-			car_y <= 0;
-		else if (enable_y) begin
-			if (car_y == 48)
-				car_y <= 0;
-			else
-				car_y <= car_y + 1;
-		end
-	end
-	
+
 	always @(posedge tick) begin
 		if (!KEY[3] & direction != right) begin // left if not right
-				want_move <= 1;
 				direction <= left;
 		end else if (!KEY[2] & direction != left) begin // Right if not left
-				want_move <= 1;
 				direction <= right;
-		end else begin // No movement
-				want_move <= 0;
+		end else if (KEY[2] || KEY[3]) begin // No movement
 				direction <= none;
 		end
-		
+	end
+	
+	always @(posedge tick) begin
+
 		if (can_move == 1) begin 
 			if (direction == left) begin // Left
-				
-				x_init <= x_init - speed;
-				
+				if (x_init - speed >= 0)
+					x_init <= x_init - speed;
+				else x_init <= x_init;
+
 			end else if (direction == right) begin// Right
-				
-				x_init <= x_init + speed;
-				
+				if (x_init + speed <= 293)
+					x_init <= x_init + speed;
+				else x_init <= x_init;
+
 			end else if (direction == none) begin // No movement
 			end
 		end
-		
 	end
+	
 	assign colour = (erase == 1'b1) ? colour_background : colour_car;
 
 endmodule
