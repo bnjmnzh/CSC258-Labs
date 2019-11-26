@@ -16,6 +16,7 @@ module control(clock, reset, done, erase, want_move, en_vga, en_datapath, can_mo
         else
             curr <= next; 
     end
+
     // State Table
     always @(*)
     begin: state_table
@@ -23,7 +24,7 @@ module control(clock, reset, done, erase, want_move, en_vga, en_datapath, can_mo
 			PLOT: next = done ? PLOT_WAIT : PLOT ;
             PLOT_WAIT: next = want_move ? ERASE : PLOT_WAIT ;
             ERASE: next = done ? PLOT : ERASE ;
-				MOVE: next = PLOT;
+			MOVE: next = PLOT;
             default: next = PLOT;
         endcase
     end
@@ -32,18 +33,18 @@ module control(clock, reset, done, erase, want_move, en_vga, en_datapath, can_mo
     begin
         case (curr)
             PLOT:
-	         begin
-				en_vga = 1;
-				en_datapath = 1;
+	        begin
+			en_vga = 1;
+			en_datapath = 1;
             erase = 0;
-				can_move = 0;
-				end
+			can_move = 0;
+			end
             PLOT_WAIT:
             begin
             en_vga = 0;
             en_datapath = 0;
             erase = 0;
-				can_move = 0;	 
+			can_move = 0;	 
             end
             ERASE:
             begin
@@ -51,8 +52,8 @@ module control(clock, reset, done, erase, want_move, en_vga, en_datapath, can_mo
             en_datapath = 1;
             erase = 1;
             can_move = 0;
-				end
-				MOVE: can_move = 1;
+			end
+			MOVE: can_move = 1;
         endcase
     end
 endmodule
