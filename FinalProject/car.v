@@ -1,36 +1,46 @@
- module car (
-    input wire clk,
-    input wire tick,    // tick: frequency to check keyboard input
-    input wire reset,         // reset: returns to starting position
-    input wire left_key, right_key, // if left and right arrow keys pressed
-    output reg [8:0] car_xleft,  // car hitbox left edge: 9-bit value for 320x240 resolution
-    output reg [8:0] car_xright,  // right edge
-    output reg [7:0] car_ytop,  // top edge: 8-bit value for 320x240 resolution
-    output reg [7:0] car_ybottom   // bottom edge
-    );
+module car(clk, left_key, right_key, speed, can_move, car_x, reset, direction);
 
-    localparam move_speed = 10; // pixels to move per left/right key
-    localparam car_height = 30; // car is 30 pixels high
-    localparam car_width = 15;
+input clk, left_key, right_key, can_move, reset;
+input [3:0] speed;
+inout reg [7:0] car_x;
 
-    assign car_xright = car_xleft + car_width;  // left: centre minus half horizontal size
-    assign car_ybottom = 5;
-    assign car_ytop = car_height + car_bottom;
+localparam 	none = 2'b00,
+				left = 2'b01,
+				right = 2'b10;
+				
+output reg [2:0] direction = none;
 
-    always @(posedge clk)
-    begin
-    if (reset)
-        car_xleft <= 100;
-    else if (tick)
-        begin
+	always @(posedge clk) begin
+	
+		if (left_key ^ right_key) begin
+			
+			if (left_key)
+				direction <= left;
+				
+			else if (right_key) 
+				direction <= right;
+				
+		end 
+		
+		else
+			direction <= none;
+		
+	end
+	
+	always @(posedge clk) begin
 
-	if (right_key && left_key)
-            car_xl <= car_xl;  // nothing happens
-        else if (right_key && (car_xr < 300) // checks car wont move off screen
-            car_xl <= car_xl + move_speed; // move right
-        else if (left_key & (car_xl > 20)) // checks car wont move off screen
-            car_xl <= car_xl - move_speed; // move left 
-
-        end
-    end
+		if (can_move == 1) begin // after erasing, control will give the can_move signal
+			if (reset == 1)
+				car_x <= 150;
+			if (direction == left) begin
+				if (car_x - speed >= 5)
+					car_x <= car_x - speed;
+					
+			end else if (direction == right) begin
+				if (car_x + speed <= 205)
+					car_x <= car_x + speed;
+					
+			end 
+		end
+	end
 endmodule
