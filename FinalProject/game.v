@@ -25,15 +25,12 @@ module game(
 	wire resetn, erase, done;
 	assign resetn = !KEY[0];
 	wire [2:0] colour;
-	wire [2:0] colour_car;
 	wire can_move;
-	wire [7:0] car_x;
-	wire [7:0] car_y = 190;
-	wire [7:0] x_final;
+	wire [8:0] x_final;
 	wire [7:0] y_final;
 	wire [7:0] keyValue;
 	wire tick;
-	reg [31:0] tps = 600000;
+	reg [31:0] tps = 100000;
 	wire writeEn, enable, id_x, id_y;
 	wire [2:0] state;
 	wire [2:0] direction;
@@ -72,89 +69,116 @@ module game(
 //------------------------------------------------
 // Instansiate FSM control
 
-	control c0(
+	control #(
+		.colour_background(colour_background)
+		) c0(
 		.clock(tick),
 		.reset(resetn),
 		.erase(erase),
-		.done(done),
+		.done(car_done | p1_done),
 		.en_vga(writeEn),
-		.en_datapath(enable),
-		.want_to_move(|direction), // since none = 0, if direction != none, then (|direction) = 1
+		.want_to_move(| {direction, move_p}), // since none = 0, if direction != none, then (|direction) = 1, also triggers if move_p = 1
 		.can_move(can_move),
-		.state(state)
-	);
-
-//------------------------------------------------	
-// Instansiate datapath
-
-	datapath d0(
-		.x_in(car_x),
-		.y_in(car_y),
-		.clock(tick),
-		.resetn(resetn),
-		.done(done),
-		.enable(enable),
-		.x_out(x_final),
-		.y_out(y_final)
+		.state(state),
+		.colour_car(colour_car), 
+		.car_x_final(car_x_final), 
+		.car_y_final(car_y_final),
+		.en_car_datapath(en_car_datapath),
+		.colour_pedestrian(colour_p1), 
+		.pedestrian_x_final(p1_x_final), 
+		.pedestrian_y_final(p1_y_final),
+		.en_pedestrian_datapath(en_pedestrian_datapath),
+		.x_final(x_final), 
+		.y_final(y_final),
+		.colour(colour)
 	);
 	
-//------------------------------------------------
-// Returns color of pixel in .mif for x,y coordinates
-
-	sprite_ram #(
-        .WIDTH_X(6),
-        .WIDTH_Y(8),
-        .RESOLUTION_X(27),
-        .RESOLUTION_Y(48),
-        .MIF_FILE("PixelCar.mif")
-    ) car (
-        .clk(tick),
-        .x(x_final - car_x), .y(y_final - car_y),
-        .color_out(colour_car)
-    );
-
 //------------------------------------------------
 // SET TICK
 
 	tick t0(CLOCK_50, tick, tps);
 	
 //------------------------------------------------
-// CAR MOVEMENT
+// CAR
+	wire [8:0] car_x, car_x_final;
+	wire [7:0] car_y = 190;
+	wire [7:0] car_y_final;
+	wire [2:0] colour_car;
+	wire en_car_datapath;
+	wire car_done;
 	
 	car car0(.clk(tick),
 				.left_key(!KEY[3]),
 				.right_key(!KEY[2]),
-				.speed(1),
+				.speed(2),
 				.can_move(can_move),
 				.car_x(car_x),
 				.reset(resetn),
 				.direction(direction)
 			);
-	
-//------------------------------------------------
-// ASSIGN COLOR TO BE BLACK (ERASE) OR NOT
-	
-	assign colour = (erase == 1'b1) ? colour_background : colour_car;
+			
+	sprite_ram #(
+        .WIDTH_X(6),
+        .WIDTH_Y(8),
+        .RESOLUTION_X(27),
+        .RESOLUTION_Y(48),
+        .MIF_FILE("PixelCar.mif")
+    ) car_sprite(
+        .clk(tick),
+        .x(car_x_final - car_x), .y(car_y_final - car_y),
+        .color_out(colour_car)
+    );
+
+	 datapath #(
+		.x_max(26),
+		.y_max(47)
+	) car_d(
+		.x_in(car_x),
+		.y_in(car_y),
+		.clock(tick),
+		.resetn(resetn),
+		.done(car_done),
+		.enable(en_car_datapath),
+		.x_out(car_x_final),
+		.y_out(car_y_final)
+	);
 	
 //------------------------------------------------
 // PEDESTRIAN (WIP)
-// Image from http://pixelartmaker.com/art/c89ff395c379999
 	
-//	wire p0_x, p0_y;
-//	
-//	pedestrian p0(tick, p0_x, p0_y, resetn);
-//	
-//		datapath d1(
-//		.x_in(p0_x),
-//		.y_in(p0_y),
-//		.clock(tick),
-//		.resetn(resetn),
-//		.done(done),
-//		.enable(enable),
-//		.x_out(x_final),
-//		.y_out(y_final)
-//	);
+	wire [8:0] p1_x, p1_x_final;
+	wire [7:0] p1_y, p1_y_final;
+	wire [2:0] p1_colour;
+	wire move_p, en_pedestrian_datapath, p1_done;
 	
+	pedestrian p1(tick, p1_x, p1_y, move_p);
+	
+	datapath #(
+		.x_max(9),
+		.y_max(16)
+	) ped1_d(
+		.x_in(p1_x),
+		.y_in(p1_y),
+		.clock(tick),
+		.resetn(resetn),
+		.done(p1_done),
+		.enable(en_pedestrian_datapath),
+		.x_out(p1_x_final),
+		.y_out(p1_y_final)
+	);
+	
+	sprite_ram #(
+        .WIDTH_X(4),
+        .WIDTH_Y(5),
+        .RESOLUTION_X(10),
+        .RESOLUTION_Y(17),
+        .MIF_FILE("pedestrian.mif")
+    ) p1_sprite(
+        .clk(tick),
+        .x(p1_x_final - p1_x), .y(p1_y_final - p1_y),
+        .color_out(colour_p1)
+    );
+	 
 //------------------------------------------------
 
 endmodule

@@ -2,7 +2,7 @@ module car(clk, left_key, right_key, speed, can_move, car_x, reset, direction);
 
 input clk, left_key, right_key, can_move, reset;
 input [3:0] speed;
-inout reg [7:0] car_x;
+inout reg [8:0] car_x;
 
 localparam 	none = 2'b00,
 				left = 2'b01,
@@ -33,11 +33,11 @@ output reg [2:0] direction = none;
 			if (reset == 1)
 				car_x <= 150;
 			if (direction == left) begin
-				if (car_x - speed >= 5)
+				if (car_x - speed >= 2)
 					car_x <= car_x - speed;
 					
 			end else if (direction == right) begin
-				if (car_x + speed <= 205)
+				if (car_x + speed <= 290)
 					car_x <= car_x + speed;
 					
 			end 

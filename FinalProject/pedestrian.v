@@ -1,6 +1,7 @@
-module pedestrian(clk, x, y, reset);
+module pedestrian(clk, x, y, move_p, can_move, reset);
 	input clk, reset;
 	inout reg [7:0] x, y;
+	output move_p;
 	
 	wire [6:0]random;
 	
@@ -11,7 +12,8 @@ module pedestrian(clk, x, y, reset);
 			x <= random;
 			y <= 0;
 		end else
-			y <= y + 1;
+			if (can_move)
+				y <= y + 1;
 	end
 		
 endmodule
