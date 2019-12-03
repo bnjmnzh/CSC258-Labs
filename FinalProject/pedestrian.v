@@ -1,19 +1,24 @@
-module pedestrian(clk, x, y, move_p, can_move, reset);
-	input clk, reset;
+module pedestrian(clk, x, y, move_p, can_move, reset, dead);
+	input clk, reset, can_move;
 	inout reg [7:0] x, y;
-	output move_p;
-	
-	wire [6:0]random;
-	
-	fibonacci_lfsr_7bit rng(clk, reset, random);
+	output reg move_p, dead;
 	
 	always @(posedge clk) begin
 		if (reset) begin
-			x <= random;
 			y <= 0;
+			move_p <= 0;
+			dead <= 0;
 		end else
-			if (can_move)
-				y <= y + 1;
+			if (can_move) begin
+				move_p <= 1;
+				if (y > 190) begin
+					dead <= 1;
+					y <= 0;
+				end else begin 
+					y <= y + 3;
+					dead <= 0;
+				end
+			end
 	end
 		
 endmodule

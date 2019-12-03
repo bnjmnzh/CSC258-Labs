@@ -35,7 +35,7 @@ module game(
 	wire [2:0] state;
 	wire [2:0] direction;
 
-	hex_decoder h0(done,HEX0);
+	
 	hex_decoder h1(can_move,HEX1);
 	hex_decoder h2(erase,HEX2);
 	hex_decoder h3(state,HEX3);
@@ -149,15 +149,21 @@ module game(
 	wire [8:0] p1_x, p1_x_final;
 	wire [7:0] p1_y, p1_y_final;
 	wire [2:0] p1_colour;
-	wire move_p, en_pedestrian_datapath, p1_done;
+	wire move_p, en_pedestrian_datapath, p1_done, can_move_p, dead;
 	
-	pedestrian p1(tick, p1_x, p1_y, move_p);
+	wire [8:0]random;
+	fibonacci_lfsr_8bit rng(tick, resetn, dead, random);
 	
+	pedestrian p1(tick, p1_x, p1_y, move_p, can_move, resetn, dead);
+	
+	hex_decoder h0(dead,HEX0);
+	
+	  
 	datapath #(
 		.x_max(9),
 		.y_max(16)
 	) ped1_d(
-		.x_in(p1_x),
+		.x_in(random),
 		.y_in(p1_y),
 		.clock(tick),
 		.resetn(resetn),
@@ -175,7 +181,7 @@ module game(
         .MIF_FILE("pedestrian.mif")
     ) p1_sprite(
         .clk(tick),
-        .x(p1_x_final - p1_x), .y(p1_y_final - p1_y),
+        .x(p1_x_final - random), .y(p1_y_final - p1_y),
         .color_out(colour_p1)
     );
 	 
