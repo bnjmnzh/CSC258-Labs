@@ -9,15 +9,20 @@ module pedestrian(clk, x, y, move_p, hit, can_move, reset);
 
 	
 	always @(posedge clk) begin
+		if (reset == 1) begin
+			y <= 0;
+			move_p <= 0;
+		end else begin
 	
-		move_p <= 1;
-		
-		if (can_move) begin
-			if (reset == 1 | hit == 1) begin
-				x <= 20 + random;
-				y <= 0;
-			end else 
-				y <= y + 1;
+			move_p <= 1;
+			
+			if (can_move) begin
+				if (hit == 1) begin
+					x <= 10 + random;
+					y <= 0;
+				end else 
+					y <= y + 1;
+			end
 		end
 	end
 		

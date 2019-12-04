@@ -70,7 +70,8 @@ module control(clock, reset, done, erase, en_vga, want_to_move, can_move, state,
 				y_final = car_y_final;
 				colour = colour_car;
 				
-				hit = 0;
+				hit <= 0;
+				gameover <= 0;
 			end
 			PLOT_PEDESTRIAN: begin
 				en_vga = 1;
@@ -82,6 +83,9 @@ module control(clock, reset, done, erase, en_vga, want_to_move, can_move, state,
 				x_final = pedestrian_x_final;
 				y_final = pedestrian_y_final;
 				colour = colour_pedestrian;
+				
+				hit <= 0;
+				gameover <= 0;
 			end
          PLOT_WAIT: begin
             en_vga = 0;
@@ -90,7 +94,8 @@ module control(clock, reset, done, erase, en_vga, want_to_move, can_move, state,
             erase = 0;
 				can_move = 0;
 				
-
+				hit <= 0;
+				gameover <= 0;
          end
 			ERASE_CAR: begin
             en_vga = 1;
@@ -102,6 +107,9 @@ module control(clock, reset, done, erase, en_vga, want_to_move, can_move, state,
 				x_final = car_x_final;
 				y_final = car_y_final;
 				colour = colour_background;
+				
+				hit <= 0;
+				gameover <= 0;
 			end
 			ERASE_PEDESTRIAN: begin
 				en_vga = 1;
@@ -113,6 +121,9 @@ module control(clock, reset, done, erase, en_vga, want_to_move, can_move, state,
 				x_final = pedestrian_x_final;
 				y_final = pedestrian_y_final;
 				colour = colour_background;
+				
+				hit <= 0;
+				gameover <= 0;
 			end
 			MOVE: begin
             en_vga = 0;
@@ -120,13 +131,15 @@ module control(clock, reset, done, erase, en_vga, want_to_move, can_move, state,
 				en_pedestrian_datapath = 0;
             erase = 0;
             can_move = 1;
-				if (pedestrian_x <= car_x + 26 && pedestrian_x + 9 >= car_x && pedestrian_y + 16 >= car_y) begin
-					hit = 1;
-					gameover = 0;
-//				end else begin
-//					gameover = (pedestrian_y >= 240)? 1: 0;
+				if ((pedestrian_x <= car_x + 26) && 
+					(pedestrian_x + 9 >= car_x) && 
+					(pedestrian_y <= car_y + 4) && 
+					(pedestrian_y + 16 >= car_y)) begin 
+					hit <= 1;
+					gameover <= 0;
 				end
-				
+//				end else
+//					gameover = (pedestrian_y >= 240)? 1: 0;
 			end
         endcase
     end

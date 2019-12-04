@@ -35,12 +35,12 @@ module game(
 	wire [2:0] state;
 	wire [2:0] direction;
 
-	hex_decoder h0(gameover,HEX0);
-	hex_decoder h1(hit,HEX1);
-	hex_decoder h2(state, HEX2);
-	hex_decoder h3(score,HEX3);
-	hex_decoder h4(p1_y,HEX4);
-	hex_decoder h5(p1_x,HEX5);
+	hex_decoder h0(hit,HEX0);
+	hex_decoder h1(pedestrian_x <= car_x + 26,HEX1);
+	hex_decoder h2(pedestrian_x + 9 >= car_x, HEX2);
+	hex_decoder h3(pedestrian_y <= car_y + 46,HEX3);
+	hex_decoder h4(pedestrian_y + 16 >= car_y,HEX4);
+	hex_decoder h5(score,HEX5);
 
 //------------------------------------------------
 // VGA 
