@@ -1,20 +1,22 @@
 module control(clock, reset, done, erase, en_vga, want_to_move, can_move, state,
+					car_x, car_y, pedestrian_x, pedestrian_y,
 					colour_car, car_x_final, car_y_final, en_car_datapath,
 					colour_pedestrian, pedestrian_x_final, pedestrian_y_final, en_pedestrian_datapath,
-					x_final, y_final, colour);
+					x_final, y_final, colour, gameover, hit);
 
 	parameter colour_background; 
 	
    input clock, reset, done, want_to_move;
 	input [2:0] colour_car, colour_pedestrian;
-	input [8:0] car_x_final, pedestrian_x_final;
-	input [7:0] car_y_final, pedestrian_y_final;
+	input [8:0] car_x_final, pedestrian_x_final, car_x, pedestrian_x;
+	input [7:0] car_y_final, pedestrian_y_final, car_y, pedestrian_y;
 	output reg [2:0] colour;
 	output reg [8:0] x_final;
 	output reg [7:0] y_final;
 	output reg en_vga, erase, can_move, en_car_datapath, en_pedestrian_datapath;
 	output [2:0] state;
    reg [2:0] curr, next;
+	output reg gameover, hit;
 
    localparam  PLOT_CAR = 0,
 					PLOT_PEDESTRIAN = 1,
@@ -41,7 +43,7 @@ module control(clock, reset, done, erase, en_vga, want_to_move, can_move, state,
 				PLOT_PEDESTRIAN: next = done ? PLOT_WAIT : PLOT_PEDESTRIAN ;
 				
 				// wait for move signal
-				PLOT_WAIT: next = want_to_move ? ERASE_CAR : PLOT_WAIT ;
+				PLOT_WAIT: next = (want_to_move && (gameover==0)) ? ERASE_CAR : PLOT_WAIT ;
 				
 				// erase each object
 				ERASE_CAR: next = done ? ERASE_PEDESTRIAN : ERASE_CAR ;
@@ -67,6 +69,8 @@ module control(clock, reset, done, erase, en_vga, want_to_move, can_move, state,
 				x_final = car_x_final;
 				y_final = car_y_final;
 				colour = colour_car;
+				
+				hit = 0;
 			end
 			PLOT_PEDESTRIAN: begin
 				en_vga = 1;
@@ -84,7 +88,9 @@ module control(clock, reset, done, erase, en_vga, want_to_move, can_move, state,
 				en_car_datapath = 0;
 				en_pedestrian_datapath = 0;
             erase = 0;
-				can_move = 0;	 
+				can_move = 0;
+				
+
          end
 			ERASE_CAR: begin
             en_vga = 1;
@@ -114,6 +120,13 @@ module control(clock, reset, done, erase, en_vga, want_to_move, can_move, state,
 				en_pedestrian_datapath = 0;
             erase = 0;
             can_move = 1;
+				if (pedestrian_x <= car_x + 26 && pedestrian_x + 9 >= car_x && pedestrian_y + 16 >= car_y) begin
+					hit = 1;
+					gameover = 0;
+//				end else begin
+//					gameover = (pedestrian_y >= 240)? 1: 0;
+				end
+				
 			end
         endcase
     end

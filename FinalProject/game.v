@@ -20,7 +20,7 @@ module game(
 	output [6:0] HEX0, HEX1, HEX2, HEX3, HEX4, HEX5;
 
 
-	localparam colour_background = 3'b000;
+	localparam colour_background = 0;
 
 	wire resetn, erase, done;
 	assign resetn = !KEY[0];
@@ -34,10 +34,13 @@ module game(
 	wire writeEn, enable, id_x, id_y;
 	wire [2:0] state;
 	wire [2:0] direction;
-	wire [4:0] score;			
 
-	
-	hex_decoder h5(can_move,HEX5);
+	hex_decoder h0(gameover,HEX0);
+	hex_decoder h1(hit,HEX1);
+	hex_decoder h2(state, HEX2);
+	hex_decoder h3(score,HEX3);
+	hex_decoder h4(p1_y,HEX4);
+	hex_decoder h5(p1_x,HEX5);
 
 //------------------------------------------------
 // VGA 
@@ -65,6 +68,8 @@ module game(
 
 //------------------------------------------------
 // Instansiate FSM control
+	reg [3:0] score;
+	wire gameover, hit;
 
 	control #(
 		.colour_background(colour_background)
@@ -77,6 +82,10 @@ module game(
 		.want_to_move(| {direction, move_p}), // since none = 0, if direction != none, then (|direction) = 1, also triggers if move_p = 1
 		.can_move(can_move),
 		.state(state),
+		.car_x(car_x),
+		.car_y(car_Y),
+		.pedestrian_x(p1_x),
+		.pedestrian_y(p1_y),
 		.colour_car(colour_car), 
 		.car_x_final(car_x_final), 
 		.car_y_final(car_y_final),
@@ -87,10 +96,19 @@ module game(
 		.en_pedestrian_datapath(en_pedestrian_datapath),
 		.x_final(x_final), 
 		.y_final(y_final),
-		.colour(colour)
+		.colour(colour),
+		.gameover(gameover),
+		.hit(hit)
 	);
 	
-	hex_decoder h4(state,HEX4);
+	always @(posedge tick) begin
+		if (resetn == 1)
+			score <= 0;
+		else
+			if (hit == 1)
+				score <= score + 1;
+	end
+	
 	
 //------------------------------------------------
 // SET TICK
@@ -143,18 +161,15 @@ module game(
 	);
 	
 //------------------------------------------------
-// PEDESTRIAN (WIP)
+// PEDESTRIAN
 	
 	wire [8:0] p1_x, p1_x_final;
 	wire [7:0] p1_y, p1_y_final;
 	wire [2:0] p1_colour;
-	wire move_p, en_pedestrian_datapath, p1_done, can_move_p, dead;
+	wire move_p, en_pedestrian_datapath, p1_done, can_move_p;
 	
-	pedestrian p1(tick, p1_x, p1_y, move_p, can_move, resetn, dead);
-	
-	hex_decoder h0(dead,HEX0);
-	hex_decoder h1(p1_x[4:0],HEX1);
-	hex_decoder h2(p1_x[8:5],HEX2);
+	pedestrian p1(.clk(tick), .x(p1_x), .y(p1_y), .move_p(move_p), .hit(hit), .can_move(can_move), .reset(resetn));
+
 	  
 	datapath #(
 		.x_max(9),
@@ -178,7 +193,7 @@ module game(
         .MIF_FILE("pedestrian.mif")
     ) p1_sprite(
         .clk(tick),
-        .x(p1_x_final - p1_x), .y(p1_y_final - p1_x),
+        .x(p1_x_final - p1_x), .y(p1_y_final - p1_y),
         .color_out(colour_p1)
     );
 	 
