@@ -1,6 +1,7 @@
 module car(clk, a, d, left_key, right_key, speed, can_move, car_x, reset, direction);
 
-input clk, can_move, reset, a, d, left_key, right_key;
+input clk, can_move, reset, left_key, right_key;
+input a, d;
 input [3:0] speed;
 inout reg [8:0] car_x;
 
@@ -17,12 +18,12 @@ output reg [2:0] direction = none;
 			if (left_key || a)
 				direction <= left;
 				
-			else if (right_key || d) 
+			else if (right_key || d)
 				direction <= right;
-				
-			else
-				direction <= none;
 		end
+				
+		else
+			direction <= none;
 				
 	end
 	

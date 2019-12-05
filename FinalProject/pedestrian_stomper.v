@@ -36,12 +36,18 @@ module pedestrian_stomper(
 	wire writeEn, enable, id_x, id_y;
 	wire [2:0] state;
 	wire [2:0] direction;
+	wire a1, a2, a3, a4;
+	
+	assign a1 = p1_y + 16 >= car_y; // p_y2 > c_y1
+	assign a2 = p1_y <= car_y + 47; // p_y1 < c_y2
+	assign a3 = p1_x + 9 >= car_x; // p_x2 > c_x1
+	assign a4 = p1_x <= car_x + 26;  // p_x1 < c_x2
 
 	hex_decoder h0(hit,HEX0);
-	assign LEDR[3] = p1_y + 16 >= car_y; // p_y2 > c_x1
-	assign LEDR[2] = p1_y <= car_y + 47; // p_y1 < c_x2
-	assign LEDR[1] = p1_x + 9 >= car_x; // p_x2 > c_x1
-	assign LEDR[0] = p1_x <= car_x + 26;  // p_x1 < c_x2
+	hex_decoder h1(p1_y[3:0],HEX1);
+	hex_decoder h2(p1_y[7:4],HEX2);
+	hex_decoder h3(p1_x[4:0],HEX3);
+	hex_decoder h4(p1_x[8:5],HEX4);
 	hex_decoder h5(score,HEX5);
 
 //------------------------------------------------
@@ -185,10 +191,18 @@ module pedestrian_stomper(
 	
 	wire [8:0] p1_x, p1_x_final;
 	wire [7:0] p1_y, p1_y_final;
-	wire [2:0] p1_colour;
-	wire move_p, en_pedestrian_datapath, p1_done, can_move_p;
+	wire [2:0] colour_p1;
+	wire move_p, en_pedestrian_datapath, p1_done;
 	
-	pedestrian p1(.clk(tick), .x(p1_x), .y(p1_y), .move_p(move_p), .hit(hit), .can_move(can_move), .reset(resetn));
+	pedestrian p1(
+		.clk(tick), 
+		.x(p1_x), 
+		.y(p1_y), 
+		.move_p(move_p), 
+		.hit(hit), 
+		.can_move(can_move), 
+		.reset(resetn)
+		);
 
 	  
 	datapath #(
@@ -218,5 +232,40 @@ module pedestrian_stomper(
     );
 	 
 //------------------------------------------------
+
+//	wire [8:0] p2_x, p2_x_final;
+//	wire [7:0] p2_y, p2_y_final;
+//	wire [2:0] colour_p2;
+//	wire move_p, en_pedestrian_datapath, p1_done;
+//	
+//	pedestrian p2(.clk(tick), .x(p2_x), .y(p2_y), .
+//(move_p), .hit(hit), .can_move(can_move), .reset(resetn));
+//
+//	  
+//	datapath #(
+//		.x_max(9),
+//		.y_max(16)
+//	) ped1_d(
+//		.x_in(p2_x),
+//		.y_in(p2_y),
+//		.clock(tick),
+//		.resetn(resetn),
+//		.done(p2_done),
+//		.enable(en_pedestrian_datapath),
+//		.x_out(p2_x_final),
+//		.y_out(p2_y_final)
+//	);
+//	
+//	sprite_ram #(
+//        .WIDTH_X(4),
+//        .WIDTH_Y(5),
+//        .RESOLUTION_X(10),
+//        .RESOLUTION_Y(17),
+//        .MIF_FILE("pedestrian.mif")
+//    ) p1_sprite(
+//        .clk(tick),
+//        .x(p2_x_final - p2_x), .y(p2_y_final - p2_y),
+//        .color_out(colour_p2)
+//    );
 
 endmodule
