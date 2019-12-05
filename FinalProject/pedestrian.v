@@ -20,8 +20,11 @@ module pedestrian(clk, x, y, move_p, hit, can_move, reset);
 				if (hit == 1) begin
 					x <= 10 + random;
 					y <= 0;
-				end else 
-					y <= y + 1;
+				end else
+					if (y == 240)
+						y <= 0;
+					else
+						y <= y + 1;
 			end
 		end
 	end

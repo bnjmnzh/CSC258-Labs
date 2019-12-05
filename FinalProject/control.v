@@ -133,7 +133,7 @@ module control(clock, reset, done, erase, en_vga, want_to_move, can_move, state,
             can_move = 1;
 				if ((pedestrian_x <= car_x + 26) && 
 					(pedestrian_x + 9 >= car_x) && 
-					(pedestrian_y <= car_y + 4) && 
+					(pedestrian_y <= car_y + 47) && 
 					(pedestrian_y + 16 >= car_y)) begin 
 					hit <= 1;
 					gameover <= 0;

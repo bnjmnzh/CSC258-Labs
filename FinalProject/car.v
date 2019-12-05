@@ -1,6 +1,6 @@
-module car(clk, left_key, right_key, speed, can_move, car_x, reset, direction);
+module car(clk, a, d, left_key, right_key, speed, can_move, car_x, reset, direction);
 
-input clk, left_key, right_key, can_move, reset;
+input clk, can_move, reset, a, d, left_key, right_key;
 input [3:0] speed;
 inout reg [8:0] car_x;
 
@@ -12,19 +12,18 @@ output reg [2:0] direction = none;
 
 	always @(posedge clk) begin
 	
-		if (left_key ^ right_key) begin
+		if (left_key ^ right_key ^ a ^ d) begin
 			
-			if (left_key)
+			if (left_key || a)
 				direction <= left;
 				
-			else if (right_key) 
+			else if (right_key || d) 
 				direction <= right;
 				
-		end 
-		
-		else
-			direction <= none;
-		
+			else
+				direction <= none;
+		end
+				
 	end
 	
 	always @(posedge clk) begin
@@ -39,8 +38,8 @@ output reg [2:0] direction = none;
 			end else if (direction == right) begin
 				if (car_x + speed <= 290)
 					car_x <= car_x + speed;
-					
+
 			end 
 		end
 	end
-endmodule
+endmodule 
