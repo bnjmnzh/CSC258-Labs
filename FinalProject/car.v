@@ -33,7 +33,7 @@ output reg [2:0] direction = none;
 			if (reset == 1)
 				car_x <= 150;
 			if (direction == left) begin
-				if (car_x - speed >= 2)
+				if (car_x - speed >= 6)
 					car_x <= car_x - speed;
 					
 			end else if (direction == right) begin

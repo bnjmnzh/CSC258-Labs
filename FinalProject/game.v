@@ -1,12 +1,13 @@
 module game(
 		CLOCK_50, 
-		KEY, 
-		SW,
+		KEY, SW, LEDR,
+		PS2_DAT, PS2_CLK, 
 		VGA_CLK, VGA_HS, VGA_VS, VGA_BLANK_N, VGA_SYNC_N, VGA_R, VGA_G, VGA_B,
-		HEX0, HEX1, HEX2, HEX3, HEX4, HEX5,
+		HEX0, HEX1, HEX5,
 );
 
 	input	CLOCK_50;
+	inout	PS2_DAT, PS2_CLK;
 	input [9:0] SW;
 	input [3:0] KEY;
 	output VGA_CLK;   				//	VGA Clock
@@ -17,7 +18,8 @@ module game(
 	output [9:0] VGA_R;   				//	VGA Red[9:0]
 	output [9:0] VGA_G;	 				//	VGA Green[9:0]
 	output [9:0] VGA_B;   				//	VGA Blue[9:0]
-	output [6:0] HEX0, HEX1, HEX2, HEX3, HEX4, HEX5;
+	output [6:0] HEX0, HEX1, HEX5;
+	output [9:0] LEDR;
 
 
 	localparam colour_background = 0;
@@ -34,13 +36,16 @@ module game(
 	wire writeEn, enable, id_x, id_y;
 	wire [2:0] state;
 	wire [2:0] direction;
+	wire a1, a2, a3, a4;
+	
+	assign LEDR[1] = p1_y + 16 >= 190; // p_y2 > c_y1
+	assign LEDR[2] = p1_y <= 237; // p_y1 < c_y2
+	assign LEDR[3] = p1_x + 9 >= car_x; // p_x2 > c_x1
+	assign LEDR[4] = p1_x <= car_x + 26;  // p_x1 < c_x2
 
-	hex_decoder h0(hit,HEX0);
-	hex_decoder h1(pedestrian_x <= car_x + 26,HEX1);
-	hex_decoder h2(pedestrian_x + 9 >= car_x, HEX2);
-	hex_decoder h3(pedestrian_y <= car_y + 46,HEX3);
-	hex_decoder h4(pedestrian_y + 16 >= car_y,HEX4);
-	hex_decoder h5(score,HEX5);
+	hex_decoder h1(score[4:0],HEX0);
+	hex_decoder h2(score[7:4],HEX1);
+	hex_decoder h5(p_speed, HEX5);
 
 //------------------------------------------------
 // VGA 
@@ -65,11 +70,28 @@ module game(
 		defparam VGA.MONOCHROME = "FALSE";
 		defparam VGA.BITS_PER_COLOUR_CHANNEL = 1;
 		defparam VGA.BACKGROUND_IMAGE = "black.mif";
+		
+//------------------------------------------------	
+// Keyboard controller
+//		
+	wire a, d, left, right;
+	
+		 keyboard_tracker #(.PULSE_OR_HOLD(0)) tester(
+	     .clock(CLOCK_50),
+		  .reset(resetn),
+		  .PS2_CLK(PS2_CLK),
+		  .PS2_DAT(PS2_DAT),
+		  .a(a),
+		  .d(d),
+		  .left(left),
+		  .right(right),
+		  );
 
 //------------------------------------------------
 // Instansiate FSM control
-	reg [3:0] score;
+	reg [7:0] score;
 	wire gameover, hit;
+	reg [3:0] p_speed = 1;
 
 	control #(
 		.colour_background(colour_background)
@@ -89,11 +111,11 @@ module game(
 		.colour_car(colour_car), 
 		.car_x_final(car_x_final), 
 		.car_y_final(car_y_final),
-		.en_car_datapath(en_car_datapath),
+		.en_car_counter(en_car_counter),
 		.colour_pedestrian(colour_p1), 
 		.pedestrian_x_final(p1_x_final), 
 		.pedestrian_y_final(p1_y_final),
-		.en_pedestrian_datapath(en_pedestrian_datapath),
+		.en_pedestrian_counter(en_pedestrian_counter),
 		.x_final(x_final), 
 		.y_final(y_final),
 		.colour(colour),
@@ -102,11 +124,16 @@ module game(
 	);
 	
 	always @(posedge tick) begin
-		if (resetn == 1)
+		if (resetn == 1) begin
 			score <= 0;
-		else
-			if (hit == 1)
+			p_speed <= 1;
+		end else
+			if (hit == 1) begin
 				score <= score + 1;
+				if (score % 4 == 0)
+					if (p_speed < 7)
+						p_speed <= p_speed + 1;
+			end
 	end
 	
 	
@@ -121,13 +148,16 @@ module game(
 	wire [7:0] car_y = 190;
 	wire [7:0] car_y_final;
 	wire [2:0] colour_car;
-	wire en_car_datapath;
+	wire en_car_counter;
 	wire car_done;
 	
-	car car0(.clk(tick),
-				.left_key(!KEY[3]),
-				.right_key(!KEY[2]),
-				.speed(2),
+	car car0(
+				.clk(tick),
+				.a(a),
+				.d(d),
+				.left_key(left),
+				.right_key(right),
+				.speed(5),
 				.can_move(can_move),
 				.car_x(car_x),
 				.reset(resetn),
@@ -146,7 +176,7 @@ module game(
         .color_out(colour_car)
     );
 
-	 datapath #(
+	 counter #(
 		.x_max(26),
 		.y_max(47)
 	) car_d(
@@ -155,7 +185,7 @@ module game(
 		.clock(tick),
 		.resetn(resetn),
 		.done(car_done),
-		.enable(en_car_datapath),
+		.enable(en_car_counter),
 		.x_out(car_x_final),
 		.y_out(car_y_final)
 	);
@@ -165,13 +195,22 @@ module game(
 	
 	wire [8:0] p1_x, p1_x_final;
 	wire [7:0] p1_y, p1_y_final;
-	wire [2:0] p1_colour;
-	wire move_p, en_pedestrian_datapath, p1_done, can_move_p;
+	wire [2:0] colour_p1;
+	wire move_p, en_pedestrian_counter, p1_done;
 	
-	pedestrian p1(.clk(tick), .x(p1_x), .y(p1_y), .move_p(move_p), .hit(hit), .can_move(can_move), .reset(resetn));
+	pedestrian p1(
+		.speed(p_speed),
+		.clk(tick), 
+		.x(p1_x), 
+		.y(p1_y), 
+		.move_p(move_p), 
+		.hit(hit), 
+		.can_move(can_move), 
+		.reset(resetn)
+		);
 
 	  
-	datapath #(
+	counter #(
 		.x_max(9),
 		.y_max(16)
 	) ped1_d(
@@ -180,7 +219,7 @@ module game(
 		.clock(tick),
 		.resetn(resetn),
 		.done(p1_done),
-		.enable(en_pedestrian_datapath),
+		.enable(en_pedestrian_counter),
 		.x_out(p1_x_final),
 		.y_out(p1_y_final)
 	);

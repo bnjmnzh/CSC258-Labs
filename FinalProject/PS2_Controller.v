@@ -266,4 +266,3 @@ Altera_UP_PS2_Command_Out PS2_Command_Out (
 );
 
 endmodule
-

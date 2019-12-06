@@ -1,7 +1,7 @@
 module control(clock, reset, done, erase, en_vga, want_to_move, can_move, state,
 					car_x, car_y, pedestrian_x, pedestrian_y,
-					colour_car, car_x_final, car_y_final, en_car_datapath,
-					colour_pedestrian, pedestrian_x_final, pedestrian_y_final, en_pedestrian_datapath,
+					colour_car, car_x_final, car_y_final, en_car_counter,
+					colour_pedestrian, pedestrian_x_final, pedestrian_y_final, en_pedestrian_counter,
 					x_final, y_final, colour, gameover, hit);
 
 	parameter colour_background; 
@@ -13,7 +13,7 @@ module control(clock, reset, done, erase, en_vga, want_to_move, can_move, state,
 	output reg [2:0] colour;
 	output reg [8:0] x_final;
 	output reg [7:0] y_final;
-	output reg en_vga, erase, can_move, en_car_datapath, en_pedestrian_datapath;
+	output reg en_vga, erase, can_move, en_car_counter, en_pedestrian_counter;
 	output [2:0] state;
    reg [2:0] curr, next;
 	output reg gameover, hit;
@@ -28,9 +28,9 @@ module control(clock, reset, done, erase, en_vga, want_to_move, can_move, state,
 
     // active high reset
     always @(posedge clock) begin
-        if(reset)
+        if(reset) begin
             curr <= PLOT_CAR;
-        else
+        end else
             curr <= next; 
     end
 	 
@@ -59,12 +59,12 @@ module control(clock, reset, done, erase, en_vga, want_to_move, can_move, state,
     always @(*)
     begin
 		hit <= 0;
-		gameover <= 0;
+		gameover <= (reset) ? 0 : gameover;
         case (curr)
 			PLOT_CAR: begin
 				en_vga = 1;
-				en_car_datapath = 1;
-				en_pedestrian_datapath = 0;
+				en_car_counter = 1;
+				en_pedestrian_counter = 0;
             erase = 0;
 				can_move = 0;
 				
@@ -75,8 +75,8 @@ module control(clock, reset, done, erase, en_vga, want_to_move, can_move, state,
 			end
 			PLOT_PEDESTRIAN: begin
 				en_vga = 1;
-				en_car_datapath = 0;
-				en_pedestrian_datapath = 1;
+				en_car_counter = 0;
+				en_pedestrian_counter = 1;
             erase = 0;
 				can_move = 0;
 				
@@ -86,15 +86,15 @@ module control(clock, reset, done, erase, en_vga, want_to_move, can_move, state,
 			end
          PLOT_WAIT: begin
             en_vga = 0;
-				en_car_datapath = 0;
-				en_pedestrian_datapath = 0;
+				en_car_counter = 0;
+				en_pedestrian_counter = 0;
             erase = 0;
 				can_move = 0;
          end
 			ERASE_CAR: begin
             en_vga = 1;
-				en_car_datapath = 1;
-				en_pedestrian_datapath = 0;
+				en_car_counter = 1;
+				en_pedestrian_counter = 0;
             erase = 1;
             can_move = 0;
 				
@@ -104,8 +104,8 @@ module control(clock, reset, done, erase, en_vga, want_to_move, can_move, state,
 			end
 			ERASE_PEDESTRIAN: begin
 				en_vga = 1;
-				en_car_datapath = 0;
-				en_pedestrian_datapath = 1;
+				en_car_counter = 0;
+				en_pedestrian_counter = 1;
             erase = 1;
 				can_move = 0;
 				
@@ -115,19 +115,17 @@ module control(clock, reset, done, erase, en_vga, want_to_move, can_move, state,
 			end
 			MOVE: begin
             en_vga = 0;
-				en_car_datapath = 0;
-				en_pedestrian_datapath = 0;
+				en_car_counter = 0;
+				en_pedestrian_counter = 0;
             erase = 0;
             can_move = 1;
-//				if ((pedestrian_x <= car_x + 26) && 
-//					(pedestrian_x + 9 >= car_x) && 
-//					(pedestrian_y <= car_y + 47) && 
-//					(pedestrian_y + 16 >= car_y))
-				if (pedestrian_y + 16 >= car_y)
-					hit <= 1;
-				
-//				end else
-//					gameover = (pedestrian_y >= 240)? 1: 0;
+				if ((pedestrian_x <= car_x + 26) && 
+					(pedestrian_x + 9 >= car_x) && 
+					(pedestrian_y <= 237) && 
+					(pedestrian_y + 16 >= 190))
+					hit <= 1;				
+				else
+					gameover <= (pedestrian_y >= 230)? 1: 0;
 			end
         endcase
     end
