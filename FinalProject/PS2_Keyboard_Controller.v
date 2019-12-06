@@ -2,6 +2,7 @@
  * #############
  * INSTRUCTIONS
  * #############
+ * Note: None of the PS2 keyboard code is written by us.
  *
  * This file contains a module providing a high-level interface for a PS/2
  * keyboard, with output wires indicating the status of each of the keys
